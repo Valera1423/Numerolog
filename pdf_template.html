@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нумерологический отчет для {{ user_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            margin: 2cm;
+            @top-center {
+                content: "Супер-Нумеролог";
+                font-family: 'Cinzel', serif;
+                font-size: 9pt;
+                color: #d7b06a;
+            }
+            @bottom-center {
+                content: "Страница " counter(page) " из " counter(pages);
+                font-family: 'Open Sans', sans-serif;
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #d4ccc5;
+            background-color: #0a0304;
+            margin: 0;
+            padding: 0;
+        }
+
+        .cover {
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1c0a0e 0%, #0a0304 100%);
+            color: #f2e2d4;
+            page-break-after: always;
+        }
+
+        .cover h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 36pt;
+            color: #d7b06a;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .cover .subtitle {
+            font-size: 18pt;
+            color: #b32828;
+            margin-top: 0;
+            letter-spacing: 2px;
+        }
+
+        .cover .user-info {
+            margin-top: 30px;
+            font-size: 14pt;
+            color: #f2e2d4;
+        }
+
+        section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Cinzel', serif;
+            color: #d7b06a;
+            margin-top: 20px;
+        }
+
+        h1 {
+            font-size: 24pt;
+            text-align: center;
+            border-bottom: 1px solid #d7b06a;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 18pt;
+            border-bottom: 1px solid #5e3a18;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 16pt;
+            color: #b32828;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+            margin: 20px 0;
+        }
+
+        .number-box {
+            border: 1px solid #5e3a18;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: rgba(215, 176, 106, 0.05);
+            text-align: center;
+        }
+
+        .number-box h3 {
+            margin-top: 0;
+            color: #d7b06a;
+            font-size: 14pt;
+        }
+
+        .number-box .number {
+            font-size: 36pt;
+            font-weight: bold;
+            color: #d7b06a;
+            margin: 10px 0;
+        }
+
+        .interpretation {
+            margin-top: 10px;
+            text-align: left;
+            font-size: 10pt;
+            color: #d4ccc5;
+        }
+
+        .matrix-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .matrix-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #d7b06a;
+            border-radius: 5px;
+        }
+
+        .block-text {
+            background-color: rgba(179, 40, 40, 0.1);
+            border-left: 5px solid #b32828;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .compatibility-score {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #d7b06a;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .score-bar {
+            height: 20px;
+            background-color: #1d0a0b;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+            border: 1px solid #5e3a18;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b32828 0%, #d7b06a 100%);
+            border-radius: 10px;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+            border-top: 1px solid #5e3a18;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Обложка -->
+    <div class="cover">
+        <h1>Нумерологический отчет</h1>
+        <div class="subtitle">Теневой Матрицы Судьбы</div>
+        <div class="user-info">
+            <p>для {{ user_name }}</p>
+            <p>Дата рождения: {{ birthdate }}</p>
+            <p>Дата составления: {{ current_date }}</p>
+        </div>
+    </div>
+
+    <!-- Введение -->
+    <section>
+        <h1>Ваш персональный нумерологический анализ</h1>
+        <p>{{ introduction }}</p>
+    </section>
+
+    <!-- Ключевые числа -->
+    <section>
+        <h2>Ключевые числа вашей судьбы</h2>
+        <div class="grid">
+            <div class="number-box">
+                <h3>Жизненный путь</h3>
+                <div class="number">{{ life_path_number }}</div>
+                <div class="interpretation">{{ life_path_interpretation }}</div>
+            </div>
+            <div class="number-box">
+                <h3>Выражение</h3>
+                <div class="number">{{ expression_number }}</div>
+                <div class="interpretation">{{ expression_interpretation }}</div>
+            </div>
+            <div class="number-box">
+                <h3>Душа</h3>
+                <div class="number">{{ soul_number }}</div>
+                <div class="interpretation">{{ soul_interpretation }}</div>
+            </div>
+            <div class="number-box">
+                <h3>Личность</h3>
+                <div class="number">{{ personality_number }}</div>
+                <div class="interpretation">{{ personality_interpretation }}</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Подробный анализ чисел -->
+    <section>
+        <h2>Подробный анализ чисел</h2>
+        <h3>Число жизненного пути: {{ life_path_number }}</h3>
+        <p>{{ life_path_detailed }}</p>
+        <h3>Число выражения: {{ expression_number }}</h3>
+        <p>{{ expression_detailed }}</p>
+        <h3>Число души: {{ soul_number }}</h3>
+        <p>{{ soul_detailed }}</p>
+        <h3>Число личности: {{ personality_number }}</h3>
+        <p>{{ personality_detailed }}</p>
+    </section>
+
+    <!-- Теневая Матрица Судьбы -->
+    {% if matrix %}
+    <section>
+        <h2>Ваша Теневая Матрица Судьбы</h2>
+        <p>Центральный аркан (главная задача): <b>{{ matrix.center }}</b></p>
+        <p>КРТ (Ключ Реализации Таланта): <b>{{ matrix.key_talent }}</b></p>
+        <p>КРП (Ключ Реализации Предназначения): <b>{{ matrix.key_destiny }}</b></p>
+        {% if matrix_image_base64 %}
+        <div class="matrix-container">
+            <img src="{{ matrix_image_base64 }}" alt="Теневая Матрица Судьбы">
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <!-- Блокировки -->
+    {% if block_sphere %}
+    <section>
+        <h2>Блокировка в сфере: {{ block_sphere }}</h2>
+        <div class="block-text">
+            <p>{{ block_text }}</p>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Совместимость -->
+    {% if compatibility_score %}
+    <section>
+        <h2>Анализ совместимости</h2>
+        <div class="compatibility-score">
+            Общая совместимость: {{ compatibility_score }}%
+        </div>
+        <div class="score-bar">
+            <div class="score-fill" style="width: {{ compatibility_score }}%;"></div>
+        </div>
+        <h3>Сильные стороны</h3>
+        <p>{{ compatibility_strengths }}</p>
+        <h3>Возможные трудности</h3>
+        <p>{{ compatibility_challenges }}</p>
+        <h3>Рекомендации</h3>
+        <p>{{ compatibility_recommendations }}</p>
+    </section>
+    {% endif %}
+
+    <!-- Прогноз -->
+    <section>
+        <h2>Прогноз и рекомендации</h2>
+        <p>{{ forecast }}</p>
+        <h3>Личные рекомендации</h3>
+        <p>{{ recommendations }}</p>
+    </section>
+
+    <footer>
+        <p>© Супер-Нумеролог {{ current_year }}. Все права защищены.</p>
+        <p>Данный отчет сгенерирован с использованием искусственного интеллекта.</p>
+    </footer>
+</body>
+</html>
