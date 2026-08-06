@@ -20,7 +20,16 @@ RUN chown -R $(id -u):$(id -g) /app/data 2>/dev/null || chown -R 1000:1000 /app/
 
 # Копируем файл зависимостей и устанавливаем Python-библиотеки
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir \
+    aiogram>=3.0.0 \
+    aiohttp>=3.8.3 \
+    jinja2>=3.1.2 \
+    pillow>=9.5.0 \
+    python-dotenv>=1.0.0 \
+    playwright>=1.40.0 \
+    apscheduler>=3.10.0 \
+    sentry-sdk>=1.40.0 \
+    tenacity>=8.2.0
 
 # Устанавливаем Playwright и все системные зависимости через официальный инструмент
 RUN pip install playwright && \
