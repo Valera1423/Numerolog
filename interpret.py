@@ -109,15 +109,15 @@ ARCANA_DATA = {
     "shadow3": SHADOW3,
     "talent_key": TALENT_KEY,
 }
-
 def get_arcana_interpretation(arcana: int, category: str) -> str:
     """
     Возвращает текст интерпретации для аркана по категории.
     Категории: 'talents', 'typage', 'places' и т.д.
     """
+    # Убедитесь, что ARCANA_DATA определён в этом файле (он должен быть после загрузки файлов)
     cat_data = ARCANA_DATA.get(category, {})
     return cat_data.get(arcana, f"Интерпретация для аркана {arcana} в категории {category} не найдена.")
-
+    
 # ============================
 # ГЕНЕРАЦИЯ ЛОКАЛЬНОГО ОТВЕТА (тестовый режим)
 # ============================
