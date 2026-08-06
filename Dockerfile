@@ -28,6 +28,7 @@ RUN pip install --no-cache-dir \
     sentry-sdk>=1.40.0 \
     tenacity>=8.2.0 \
     redis>=5.0.0
+# Для отправки ошибок (sentry-sdk уже включён)
 
 # Устанавливаем Playwright и системные зависимости
 RUN pip install playwright && \
