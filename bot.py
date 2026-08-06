@@ -438,12 +438,12 @@ async def generate_matrix_decoding_report(message: Message, user_id: int, test: 
     birthdate = datetime.strptime(user["birthdate"], "%Y-%m-%d").date()
     matrix = calculate_shadow_matrix(birthdate, user["fio"])
     # Генерируем PDF с расшифровкой
-    pdf_path = generate_full_pdf(
-        user_data=user,
-        numerology_data={"matrix": matrix},
-        interpretation_data={"full_report": {"introduction": "Расшифровка Матрицы Судьбы"}},
-        matrix_image_bytes=generate_matrix_image(matrix, user["fio"], user["birthdate"]),
-        report_type="matrix_decoding"
+    pdf_path = await generate_full_pdf(
+    user_data=user,
+    numerology_data={"matrix": matrix},
+    interpretation_data={"full_report": {"introduction": "Расшифровка Матрицы Судьбы"}},
+    matrix_image_bytes=generate_matrix_image(matrix, user["fio"], user["birthdate"]),
+    report_type="matrix_decoding"
     )
     if pdf_path:
         await message.answer_document(FSInputFile(pdf_path, filename="matrix_decoding.pdf"))
@@ -746,13 +746,13 @@ async def process_full_report_payment(message: Message, order: dict):
     interpretation = await send_to_n8n_for_interpretation(combined_numerology, "full")
 
     # Генерируем PDF в фоне
-    pdf_path = await asyncio.to_thread(
-        generate_full_pdf,
-        user_data=user,
-        numerology_data=combined_numerology,
-        interpretation_data=interpretation,
-        matrix_image_bytes=img_bytes,
-        report_type="full"
+    pdf_path = await generate_full_pdf(
+    user_data=user,
+    numerology_data=combined_numerology,
+    interpretation_data=interpretation,
+    matrix_image_bytes=img_bytes,
+    report_type="full"
+
     )
     if pdf_path:
         await db.update_report_pdf(report_id, pdf_path)
@@ -781,13 +781,12 @@ async def process_compatibility_payment(message: Message, order: dict):
 
     wait = await message.answer("⏳ Генерирую отчёт о совместимости...")
     compatibility_data = report["core_json"]
-    pdf_path = await asyncio.to_thread(
-        generate_full_pdf,
-        user_data=user,
-        numerology_data=compatibility_data,
-        interpretation_data={"compatibility_report": compatibility_data.get("compatibility", {})},
-        matrix_image_bytes=None,
-        report_type="compatibility"
+    pdf_path = await generate_full_pdf(
+    user_data=user,
+    numerology_data=compatibility_data,
+    interpretation_data={"compatibility_report": compatibility_data.get("compatibility", {})},
+    matrix_image_bytes=None,
+    report_type="compatibility"
     )
     if pdf_path:
         await db.update_report_pdf(report_id, pdf_path)
