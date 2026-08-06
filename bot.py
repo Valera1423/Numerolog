@@ -50,7 +50,7 @@ from utils import run_in_background, retry_n8n, validate_date, validate_fio
 from redis_cache import cache_get, cache_set, cache_delete
 
 # Sentry (если настроено)
-#from sentry_setup import init_sentry
+from sentry_setup import init_sentry
 
 # Планировщик для еженедельных прогнозов
 from scheduler import start_scheduler
@@ -103,14 +103,14 @@ async def cmd_start(message: Message, state: FSMContext):
 
     # Главное меню с иконками
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton("✨ Сделать расчёт", callback_data="start_calculation")],
-        [InlineKeyboardButton("🔮 Теневая Матрица Судьбы", callback_data="cmd_matrix")],
-        [InlineKeyboardButton("💰 Денежный треугольник", callback_data="cmd_money_triangle")],
-        [InlineKeyboardButton("🔍 Узнать блокировки", callback_data="cmd_blocks")],
-        [InlineKeyboardButton("👥 Совместимость", callback_data="cmd_compatibility")],
-        [InlineKeyboardButton("📜 История запросов", callback_data="cmd_history")],
-        [InlineKeyboardButton("📞 Консультация", callback_data="cmd_consultation")],
-        [InlineKeyboardButton("⚙️ Настройки", callback_data="cmd_settings")]
+        [InlineKeyboardButton(text="✨ Сделать расчёт", callback_data="start_calculation")],
+        [InlineKeyboardButton(text="🔮 Теневая Матрица Судьбы", callback_data="cmd_matrix")],
+        [InlineKeyboardButton(text="💰 Денежный треугольник", callback_data="cmd_money_triangle")],
+        [InlineKeyboardButton(text="🔍 Узнать блокировки", callback_data="cmd_blocks")],
+        [InlineKeyboardButton(text="👥 Совместимость", callback_data="cmd_compatibility")],
+        [InlineKeyboardButton(text="📜 История запросов", callback_data="cmd_history")],
+        [InlineKeyboardButton(text="📞 Консультация", callback_data="cmd_consultation")],
+        [InlineKeyboardButton(text="⚙️ Настройки", callback_data="cmd_settings")]
     ])
 
     await message.answer(
@@ -157,9 +157,9 @@ async def process_money_triangle_button(callback: types.CallbackQuery):
 async def process_blocks_button(callback: types.CallbackQuery):
     await callback.answer()
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton("💰 Деньги", callback_data="block_money")],
-        [InlineKeyboardButton("❤️ Отношения", callback_data="block_relations")],
-        [InlineKeyboardButton("🌿 Здоровье", callback_data="block_health")]
+        [InlineKeyboardButton(text="💰 Деньги", callback_data="block_money")],
+        [InlineKeyboardButton(text="❤️ Отношения", callback_data="block_relations")],
+        [InlineKeyboardButton(text="🌿 Здоровье", callback_data="block_health")]
     ])
     await callback.message.edit_text("🔍 Выберите сферу, чтобы узнать свою блокировку:", reply_markup=keyboard)
 
@@ -227,9 +227,9 @@ async def process_settings_button(callback: types.CallbackQuery):
 async def edit_profile(callback: types.CallbackQuery):
     await callback.answer()
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton("📅 Изменить дату рождения", callback_data="edit_birthdate")],
-        [InlineKeyboardButton("✏️ Изменить ФИО", callback_data="edit_name")],
-        [InlineKeyboardButton("👤 Просмотреть профиль", callback_data="view_profile")]
+        [InlineKeyboardButton(text="📅 Изменить дату рождения", callback_data="edit_birthdate")],
+        [InlineKeyboardButton(text="✏️ Изменить ФИО", callback_data="edit_name")],
+        [InlineKeyboardButton(text="👤 Просмотреть профиль", callback_data="view_profile")]
     ])
     await callback.message.edit_text("Настройка профиля:", reply_markup=keyboard)
 
@@ -884,7 +884,7 @@ async def toggle_push(callback: types.CallbackQuery):
 # ============================
 async def main():
     await db.init()
-  #init_sentry()
+    init_sentry()
     start_scheduler(bot)
     logger.info("🚀 Бот запущен. Тестовый режим: %s", TEST_MODE)
     await dp.start_polling(bot)
