@@ -113,7 +113,7 @@ ARCANA_DATA = {
 def get_arcana_interpretation(arcana: int, category: str) -> str:
     """
     Возвращает текст интерпретации для аркана по категории.
-    Если не найдено, возвращает заглушку.
+    Категории: 'talents', 'typage', 'places' и т.д.
     """
     cat_data = ARCANA_DATA.get(category, {})
     return cat_data.get(arcana, f"Интерпретация для аркана {arcana} в категории {category} не найдена.")
