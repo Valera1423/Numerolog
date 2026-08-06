@@ -540,7 +540,7 @@ async def process_block_choice(callback: types.CallbackQuery):
 async def generate_and_send_money_triangle(message: Message, user_numbers: list):
     await message.answer("🔮 Генерирую ваш Денежный треугольник... Это займёт несколько секунд.")
     try:
-        pdf_path = generate_money_triangle_pdf(user_numbers, output_dir=PDF_STORAGE_PATH)
+        pdf_path = await generate_money_triangle_pdf(user_numbers, output_dir=PDF_STORAGE_PATH)
         await message.answer_document(
             document=FSInputFile(pdf_path, filename="money_triangle.pdf"),
             caption="✨ Ваш Денежный треугольник готов!"
