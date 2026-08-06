@@ -17,26 +17,42 @@ EXPECT_TEXT_RESPONSE = os.getenv("EXPECT_TEXT_RESPONSE", "true").lower() == "tru
 # ============================
 # ЗАГРУЗКА ТЕКСТОВ ИЗ ФАЙЛОВ (Бот №1)
 # ============================
+import os
 
 def load_text_file(file_path: str) -> Dict[int, str]:
     """
     Загружает файл вида "1: текст\n2: текст..." в словарь.
-    Возвращает словарь {число: текст}.
+    Ищет сначала в /app/data, затем в текущей папке (fallback).
     """
     result = {}
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                parts = line.split(':', 1)
-                if len(parts) == 2:
-                    key = int(parts[0].strip())
-                    value = parts[1].strip()
-                    result[key] = value
-    except FileNotFoundError:
-        logger.warning(f"Файл {file_path} не найден, используется пустой словарь.")
+    # Возможные пути для поиска
+    possible_paths = [
+        file_path,  # исходный путь (если абсолютный)
+        os.path.join('/app/data', os.path.basename(file_path)),  # внутри контейнера
+        os.path.join(os.getcwd(), 'data', os.path.basename(file_path)),  # рядом с ботом
+        os.path.join(os.getcwd(), os.path.basename(file_path)),  # в корне бота
+    ]
+    
+    for path in possible_paths:
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    parts = line.split(':', 1)
+                    if len(parts) == 2:
+                        key = int(parts[0].strip())
+                        value = parts[1].strip()
+                        result[key] = value
+                logger.info(f"Файл загружен: {path}")
+                return result  # успешно загрузили, возвращаем
+        except FileNotFoundError:
+            continue
+        except Exception as e:
+            logger.warning(f"Ошибка при загрузке {path}: {e}")
+    
+    logger.warning(f"Файл {file_path} не найден ни в одном из путей, используется пустой словарь.")
     return result
 
 # Пути к файлам (предполагаем, что они лежат в папке data/)
