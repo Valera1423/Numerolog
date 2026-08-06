@@ -1,25 +1,25 @@
 # money_triangle_pdf.py
 import os
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 from jinja2 import Template
-from typing import List, Dict, Any
+from typing import List
 
-# ====================== ДАННЫЕ (можно вынести в отдельный файл) ======================
+# ====================== ДАННЫЕ ======================
 INNER_DESCRIPTIONS = {
-    "1": "Ты первооткрыватель, и рожден(а) создавать то, чего никто ещё не создавал... Твоя самая слабая сторона – страх проявляться...",
-    "2": "Это значит, что ты рожден(а) объединять других людей... Твоя самая слабая сторона – внутренняя недолюбленность...",
-    "5": "Это значит, что ты рожден(а) быть духовным наставником и учителем для других... Твоя самая слабая сторона – распыленность...",
-    "7": "Это значит, что ты тот человек, который способен на революции... Твоя самая слабая сторона — страх распространяться и расширяться...",
-    "8": "Это значит, что ты рожден(а) увеличивать денежный потенциал этого мира... Твоя самая слабая сторона — обостренное чувство справедливости...",
+    "1": "Ты первооткрыватель, и рожден(а) создавать то, чего никто ещё не создавал...",
+    "2": "Это значит, что ты рожден(а) объединять других людей...",
+    "5": "Это значит, что ты рожден(а) быть духовным наставником и учителем для других...",
+    "7": "Это значит, что ты тот человек, который способен на революции...",
+    "8": "Это значит, что ты рожден(а) увеличивать денежный потенциал этого мира...",
 }
 
 TRIANGLE_DESCRIPTIONS = {
-    "5": {"title": "5 АРКАН", "professions": "Всё, что связано с порядком, деньгами, счётом...", "blocks": "Хаос в делах и в жизни, если у вас незакрытые вопросы...", "spending": "В путешествия, в постоянные обучения..."},
-    "7": {"title": "7 АРКАН", "professions": "Всё, что связано с движением: турагентства, работа с машинами...", "blocks": "Отсутствие движения и цели...", "spending": "В найм финансовых советников..."},
-    "4": {"title": "4 АРКАН", "professions": "Руководящие должности... Физический труд...", "blocks": "Позиция подчинённого... Злоупотребление властью...", "spending": "В долгосрочные инвестиции (2-5 лет)..."},
-    "3": {"title": "3 АРКАН", "professions": "Бьюти-индустрия, женщины, дети...", "blocks": "Формулировка «всё сама», отрицание помощи...", "spending": "В своё творчество и хобби..."},
-    "9": {"title": "9 АРКАН", "professions": "Мудрость и духовность: учёные, врачи, целители...", "blocks": "Сомнения в своём профессионализме...", "spending": "В благотворительность..."},
-    "2": {"title": "2 АРКАН", "professions": "Деятельность, связанная с женщинами и детьми...", "blocks": "Неискренность, обсуждение других за спиной...", "spending": "Посещение гонг-медитаций, ретритов..."}
+    "5": {"title": "5 АРКАН", "professions": "Всё, что связано с порядком, деньгами, счётом...", "blocks": "Хаос в делах...", "spending": "В путешествия..."},
+    "7": {"title": "7 АРКАН", "professions": "Всё, что связано с движением...", "blocks": "Отсутствие движения...", "spending": "В найм финансовых советников..."},
+    "4": {"title": "4 АРКАН", "professions": "Руководящие должности...", "blocks": "Позиция подчинённого...", "spending": "В долгосрочные инвестиции..."},
+    "3": {"title": "3 АРКАН", "professions": "Бьюти-индустрия, женщины...", "blocks": "Формулировка «всё сама»...", "spending": "В своё творчество..."},
+    "9": {"title": "9 АРКАН", "professions": "Мудрость и духовность...", "blocks": "Сомнения в профессионализме...", "spending": "В благотворительность..."},
+    "2": {"title": "2 АРКАН", "professions": "Деятельность с женщинами и детьми...", "blocks": "Неискренность...", "spending": "Посещение гонг-медитаций..."}
 }
 
 PURPOSE_TABLE = [
@@ -33,23 +33,17 @@ PURPOSE_TABLE = [
 
 # ====================== ГЕНЕРАЦИЯ PDF ======================
 
-def generate_money_triangle_pdf(user_numbers: List[str], output_dir: str = "./pdfs") -> str:
+async def generate_money_triangle_pdf(user_numbers: List[str], output_dir: str = "./pdfs") -> str:
     """
-    Генерирует PDF с денежным треугольником.
-    user_numbers: список из 5 строк (например, ['1','2','5','8','7'])
-    output_dir: папка для сохранения PDF
-    Возвращает путь к созданному файлу.
+    Асинхронно генерирует PDF с денежным треугольником.
     """
     os.makedirs(output_dir, exist_ok=True)
 
-    # Фиксированные цифры для внешнего треугольника (по методике)
     triangle_numbers = ['5', '3', '9', '7', '2', '4']
-    
     page_data = []
     for num in user_numbers:
         if num in INNER_DESCRIPTIONS:
             page_data.append({"type": "inner", "digit": num, "content": INNER_DESCRIPTIONS[num]})
-            
     for num in triangle_numbers:
         if num in TRIANGLE_DESCRIPTIONS:
             item = TRIANGLE_DESCRIPTIONS[num]
@@ -58,7 +52,6 @@ def generate_money_triangle_pdf(user_numbers: List[str], output_dir: str = "./pd
                 "professions": item["professions"], "blocks": item["blocks"], "spending": item["spending"]
             })
 
-    # HTML Шаблон (тот же, что в тесте)
     html_template = """
     <!DOCTYPE html>
     <html>
@@ -89,14 +82,10 @@ def generate_money_triangle_pdf(user_numbers: List[str], output_dir: str = "./pd
             <svg class="pentagram-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" /><circle cx="50" cy="50" r="30" style="stroke: #b32828; fill: rgba(179, 40, 40, 0.1);" /><path d="M50 10 L65 40 L95 40 L70 55 L80 85 L50 65 L20 85 L30 55 L5 40 L35 40 Z" /></svg>
             <div class="cover-title">КОД ДЕНЕГ</div><div class="cover-subtitle">ПО 9 АРКАНАМ</div>
         </div>
-        
         <div class="page"><div class="bg-smoke"></div>
             <h1 style="z-index: 10; margin-top: -50px; font-size: 28px; letter-spacing: 3px;">Твой код успеха</h1>
-            <div class="bars-container">
-                {% for num in user_numbers %}<div class="gold-bar">{{ num }}</div>{% endfor %}
-            </div>
+            <div class="bars-container">{% for num in user_numbers %}<div class="gold-bar">{{ num }}</div>{% endfor %}</div>
         </div>
-
         {% for page in pages %}
         <div class="page text-page"><div class="bg-smoke"></div>
             {% if page.type == 'inner' %}
@@ -110,7 +99,6 @@ def generate_money_triangle_pdf(user_numbers: List[str], output_dir: str = "./pd
             {% endif %}
         </div>
         {% endfor %}
-
         <div class="page text-page"><div class="bg-smoke"></div>
             <div class="text-header">ПРЕДНАЗНАЧЕНИЕ</div>
             <table class="purpose-table">
@@ -127,15 +115,14 @@ def generate_money_triangle_pdf(user_numbers: List[str], output_dir: str = "./pd
     template = Template(html_template)
     html_output = template.render(user_numbers=user_numbers, pages=page_data, purpose_table=PURPOSE_TABLE)
 
-    # Сохраняем результат
     filename = f"money_triangle_{'_'.join(user_numbers)}.pdf"
     output_path = os.path.join(output_dir, filename)
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.set_content(html_output, wait_until="networkidle")
-        page.pdf(path=output_path, format="A4", print_background=True, margin={"top": "0mm", "bottom": "0mm", "left": "0mm", "right": "0mm"})
-        browser.close()
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.set_content(html_output, wait_until="networkidle")
+        await page.pdf(path=output_path, format="A4", print_background=True, margin={"top": "0mm", "bottom": "0mm", "left": "0mm", "right": "0mm"})
+        await browser.close()
 
     return output_path
