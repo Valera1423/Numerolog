@@ -29,7 +29,8 @@ RUN pip install --no-cache-dir \
     playwright>=1.40.0 \
     apscheduler>=3.10.0 \
     sentry-sdk>=1.40.0 \
-    tenacity>=8.2.0
+    tenacity>=8.2.0 \
+    redis>=5.0.0
 
 # Устанавливаем Playwright и все системные зависимости через официальный инструмент
 RUN pip install playwright && \
