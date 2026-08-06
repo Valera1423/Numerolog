@@ -17,7 +17,6 @@ EXPECT_TEXT_RESPONSE = os.getenv("EXPECT_TEXT_RESPONSE", "true").lower() == "tru
 # ============================
 # ЗАГРУЗКА ТЕКСТОВ ИЗ ФАЙЛОВ (Бот №1)
 # ============================
-import os
 
 def load_text_file(file_path: str) -> Dict[int, str]:
     """
@@ -109,15 +108,18 @@ ARCANA_DATA = {
     "shadow3": SHADOW3,
     "talent_key": TALENT_KEY,
 }
+
+# ============================
+# ФУНКЦИЯ ПОЛУЧЕНИЯ ИНТЕРПРЕТАЦИИ АРКАНА
+# ============================
 def get_arcana_interpretation(arcana: int, category: str) -> str:
     """
     Возвращает текст интерпретации для аркана по категории.
     Категории: 'talents', 'typage', 'places' и т.д.
     """
-    # Убедитесь, что ARCANA_DATA определён в этом файле (он должен быть после загрузки файлов)
     cat_data = ARCANA_DATA.get(category, {})
     return cat_data.get(arcana, f"Интерпретация для аркана {arcana} в категории {category} не найдена.")
-    
+
 # ============================
 # ГЕНЕРАЦИЯ ЛОКАЛЬНОГО ОТВЕТА (тестовый режим)
 # ============================
@@ -128,6 +130,8 @@ def generate_local_interpretation(data: Dict[str, Any], report_type: str) -> Dic
     Для мини-отчёта – только базовые числа.
     Для полного отчёта – включает матрицу и блокировки.
     """
+    from blocks import get_block_text  # импортируем здесь, чтобы избежать циклических импортов
+
     if report_type == "mini":
         life_path = data.get("life_path", 0)
         expression = data.get("expression", 0)
@@ -155,12 +159,18 @@ def generate_local_interpretation(data: Dict[str, Any], report_type: str) -> Dic
             center = matrix.get("center", 0)
             full_report["center_arcana"] = get_arcana_interpretation(center, "talents")
             # Можно добавить другие категории
-        # Блокировки
+        # Блокировки - используем get_block_text из blocks.py
         if block:
-            sphere = block.get("sphere")
-            number = block.get("number")
-            if sphere == "money":
-                full_report["block_text"] = get_arcana_interpretation(number, "talents")  # пример
+            sphere = block.get("sphere_name", "")
+            number = block.get("number", 0)
+            if sphere == "Деньги" or sphere == "money":
+                full_report["block_text"] = get_block_text("money", number)
+            elif sphere == "Отношения" or sphere == "relations":
+                full_report["block_text"] = get_block_text("relations", number)
+            elif sphere == "Здоровье" or sphere == "health":
+                full_report["block_text"] = get_block_text("health", number)
+            else:
+                full_report["block_text"] = block.get("text", "Текст блокировки не найден.")
         return {"full_report": full_report}
 
     elif report_type == "compatibility":
@@ -213,15 +223,7 @@ async def send_to_n8n_webhook(data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     except Exception as e:
         logger.error(f"Error sending to n8n: {e}")
         return None
-    
-def get_arcana_interpretation(arcana: int, category: str) -> str:
-    """
-    Возвращает текст интерпретации для аркана по категории.
-    Категории: 'talents', 'typage', 'places' и т.д.
-    """
-    # Убедитесь, что ARCANA_DATA определён в этом файле (он должен быть после загрузки файлов)
-    cat_data = ARCANA_DATA.get(category, {})
-    return cat_data.get(arcana, f"Интерпретация для аркана {arcana} в категории {category} не найдена.")
+
 # ============================
 # ОСНОВНАЯ ФУНКЦИЯ ДЛЯ БОТА
 # ============================
