@@ -1,7 +1,6 @@
-# Используем официальный образ Python 3.11
 FROM python:3.11-slim
 
-# Установка только базовых системных зависимостей, необходимых для некоторых Python-библиотек
+# Базовые системные зависимости
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libffi-dev \
@@ -9,16 +8,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Рабочая директория
 WORKDIR /app
 
-# Директория для постоянных данных: БД, PDF-отчёты, логи
+# Директория для постоянных данных
 ENV DATA_DIR=/app/data
 RUN mkdir -p /app/data && chmod 777 /app/data
-# Устанавливаем владельца (попытка использовать текущего пользователя или fallback)
 RUN chown -R $(id -u):$(id -g) /app/data 2>/dev/null || chown -R 1000:1000 /app/data || true
 
-# Копируем файл зависимостей и устанавливаем Python-библиотеки
+# Копируем requirements и устанавливаем зависимости
 COPY requirements.txt .
 RUN pip install --no-cache-dir \
     aiogram>=3.0.0 \
@@ -32,26 +29,31 @@ RUN pip install --no-cache-dir \
     tenacity>=8.2.0 \
     redis>=5.0.0
 
-# Устанавливаем Playwright и все системные зависимости через официальный инструмент
+# Устанавливаем Playwright и системные зависимости
 RUN pip install playwright && \
     playwright install-deps && \
     playwright install chromium
 
-# Копируем весь код проекта
+# Копируем весь код, включая папку data
 COPY . .
 
-# Создаём entrypoint-скрипт для инициализации прав на /app/data
+# Явно копируем папку data (если она есть на хосте), чтобы файлы были внутри образа
+# Это гарантирует, что даже при пустом томе файлы будут доступны
+COPY data /app/data
+
+# Проверяем, что файлы действительно скопировались (вывод в лог для отладки)
+RUN ls -la /app/data || echo "Папка data пуста"
+
+# Entrypoint
 RUN echo '#!/bin/sh' > /usr/local/bin/entrypoint.sh && \
     echo 'set -e' >> /usr/local/bin/entrypoint.sh && \
-    echo '# Инициализация прав на /app/data (важно для volume)' >> /usr/local/bin/entrypoint.sh && \
+    echo '# Инициализация прав на /app/data' >> /usr/local/bin/entrypoint.sh && \
     echo 'mkdir -p /app/data' >> /usr/local/bin/entrypoint.sh && \
     echo 'chmod 777 /app/data' >> /usr/local/bin/entrypoint.sh && \
     echo 'chown -R $(id -u):$(id -g) /app/data 2>/dev/null || true' >> /usr/local/bin/entrypoint.sh && \
-    echo '# Запускаем основное приложение' >> /usr/local/bin/entrypoint.sh && \
     echo 'exec "$@"' >> /usr/local/bin/entrypoint.sh && \
     chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Запускаем главный файл бота
 CMD ["python", "bot.py"]
