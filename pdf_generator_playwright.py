@@ -1,7 +1,7 @@
 # pdf_generator_playwright.py
 import os
 import base64
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 from jinja2 import Template
 from datetime import datetime
 from typing import Dict, Any, Optional
@@ -9,13 +9,13 @@ from typing import Dict, Any, Optional
 PDF_STORAGE_PATH = os.environ.get('PDF_STORAGE_PATH', './pdfs')
 os.makedirs(PDF_STORAGE_PATH, exist_ok=True)
 
-def generate_full_pdf(user_data: Dict[str, Any],
-                      numerology_data: Dict[str, Any],
-                      interpretation_data: Dict[str, Any],
-                      matrix_image_bytes: Optional[bytes] = None,
-                      report_type: str = 'full') -> Optional[str]:
+async def generate_full_pdf(user_data: Dict[str, Any],
+                            numerology_data: Dict[str, Any],
+                            interpretation_data: Dict[str, Any],
+                            matrix_image_bytes: Optional[bytes] = None,
+                            report_type: str = 'full') -> Optional[str]:
     """
-    Генерирует красивый PDF с использованием Playwright.
+    Генерирует красивый PDF с использованием Playwright (асинхронно).
     Включает базовые числа, Матрицу Судьбы (с картинкой), блокировки.
     """
     # Подготовка данных
@@ -96,10 +96,10 @@ def generate_full_pdf(user_data: Dict[str, Any],
 
     # Генерация PDF
     output_path = os.path.join(PDF_STORAGE_PATH, f"{report_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf")
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.set_content(html_output, wait_until="networkidle")
-        page.pdf(path=output_path, format="A4", print_background=True, margin={"top": "0mm", "bottom": "0mm", "left": "0mm", "right": "0mm"})
-        browser.close()
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.set_content(html_output, wait_until="networkidle")
+        await page.pdf(path=output_path, format="A4", print_background=True, margin={"top": "0mm", "bottom": "0mm", "left": "0mm", "right": "0mm"})
+        await browser.close()
     return output_path
