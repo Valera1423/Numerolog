@@ -1,25 +1,18 @@
 # Используем официальный образ Python 3.11
 FROM python:3.11-slim
 
-# Установка системных зависимостей для Playwright (Chromium) и работы с PDF
+# Установка только базовых системных зависимостей, необходимых для некоторых Python-библиотек
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libffi-dev \
     libjpeg-dev \
     zlib1g-dev \
-    libnss3 \
-    libatk-bridge-2.0-0 \
-    libdrm2 \
-    libxkbcommon0 \
-    libgbm1 \
-    libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Рабочая директория
 WORKDIR /app
 
 # Директория для постоянных данных: БД, PDF-отчёты, логи
-# Монтируется как Docker volume — данные сохраняются при перезапуске
 ENV DATA_DIR=/app/data
 RUN mkdir -p /app/data && chmod 777 /app/data
 # Устанавливаем владельца (попытка использовать текущего пользователя или fallback)
@@ -29,8 +22,10 @@ RUN chown -R $(id -u):$(id -g) /app/data 2>/dev/null || chown -R 1000:1000 /app/
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Устанавливаем Playwright и браузеры (Chromium) для генерации PDF
-RUN pip install playwright && playwright install chromium
+# Устанавливаем Playwright и все системные зависимости через официальный инструмент
+RUN pip install playwright && \
+    playwright install-deps && \
+    playwright install chromium
 
 # Копируем весь код проекта
 COPY . .
