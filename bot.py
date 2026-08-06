@@ -50,7 +50,7 @@ from utils import run_in_background, retry_n8n, validate_date, validate_fio
 from redis_cache import cache_get, cache_set, cache_delete
 
 # Sentry (если настроено)
-from sentry_setup import init_sentry
+#from sentry_setup import init_sentry
 
 # Планировщик для еженедельных прогнозов
 from scheduler import start_scheduler
@@ -884,7 +884,7 @@ async def toggle_push(callback: types.CallbackQuery):
 # ============================
 async def main():
     await db.init()
-    init_sentry()
+   # init_sentry()
     start_scheduler(bot)
     logger.info("🚀 Бот запущен. Тестовый режим: %s", TEST_MODE)
     await dp.start_polling(bot)
